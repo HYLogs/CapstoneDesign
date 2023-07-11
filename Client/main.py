@@ -1,7 +1,6 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
-from remoteMain import Remote
 import os
 
 from modules.Service.StudentService import StudentService
@@ -16,6 +15,8 @@ form_class = uic.loadUiType(BASE_DIR + r"\Main.ui")[0]
 class WindowClass(QMainWindow, form_class) :
     def __init__(self) :
         super().__init__()
+        self.SService = StudentService()
+
         self.setUi()
         self.setData()
 
@@ -37,8 +38,7 @@ class WindowClass(QMainWindow, form_class) :
         self.third.screenShareQuitButton.clicked.connect(self.backHome)
 
     def setData(self):
-        SService = StudentService()
-        self.connect_label.setText(str(SService.student))
+        self.connect_label.setText(str(self.SService.student))
 
 
     def remoteBtnClick(self):
@@ -61,34 +61,33 @@ class WindowClass(QMainWindow, form_class) :
 
     def showRemoteScreen(self):
         self.stackedWidget.setCurrentIndex(1)
-        self.second.remote()
+        self.second.remoteControlQuitButton.clicked.connect(self.SService.closeRemote)
+        remoteScreen = self.second.screen
+        self.SService.sendRemote(remoteScreen)
 
     def closeEvent(self, QCloseEvent):
-        self.second.closeEvent()
+        self.SService.closeEvent()
+
 
 class First(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi(BASE_DIR + r"\uis\home_Qwidget.ui", self)
 
+
 class Second(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi(BASE_DIR + r"\uis\remote_control.ui", self)
 
-    def remote(self):
-        self.remoteObject = Remote(self.remoteControlQuitButton)
-        self.remoteObject.startRemote(self.screen)
-
-    def closeEvent(self, a0):
-        self.remoteObject.closeEvent()
 
 class Third(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi(BASE_DIR + r"\uis\screen_share.ui", self)
 
-if __name__ == "__main__" :
+
+if __name__ == "__main__":
     #QApplication : 프로그램을 실행시켜주는 클래스
     app = QApplication(sys.argv) 
 
