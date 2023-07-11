@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="file">
+    <file>HKbackgroundImgColor.png</file>
+    <file>SuccessState.png</file>
+    <file>HKbackgroundImg.png</file>
+  </qresource>
+</RCC>
