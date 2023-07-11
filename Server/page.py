@@ -1,35 +1,37 @@
 from PyQt5.QtWidgets import *
 from PyQt5 import uic, QtCore
 
-from ..cell import Cell
-from ..student import Student
-from ..dialog import TableDialog
+from domain import *
+from service import *
+from page import *
 
 import json
 import os
 
-CONFIG_PATH = "./setting.json"
+CONFIG_PATH = "./Server/setting.json"
 
-class Page(QWidget):
+class SupervisionPage(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi("./ui/command_center.ui", self)
-        setting = {
-            'row': 7,
-            'col': 6
-        }
+        uic.loadUi("./Server/ui/command_center.ui", self)
         
         if os.path.exists(CONFIG_PATH):
             setting = self.load_setting()
+            row, col = setting['row'], setting['col']
+        else:
+            row, col = self.get_table_setting_input()
         
-        self.row = setting['row']
-        self.col = setting['col']
+        self.row = row
+        self.col = col
+        
+        self.save_config()
+        
+        self.teacher = Teacher()
+        self.teacher_service = TeacherService(self.teacher)
         
         self.right_click_pos = None
         
-        self.students = [[0 for i in range(self.col)] for j in range(self.row)] 
-        self.cells = [[0 for i in range(self.col)] for j in range(self.row)] 
-        self.disabled_cells = [[0 for i in range(self.col)] for j in range(self.row)] 
+        self.students = [0 for _ in range(self.row * self.col)]
         
         self.setupUi()
         
@@ -37,11 +39,18 @@ class Page(QWidget):
         with open(CONFIG_PATH, 'r') as file:
             setting = json.load(file)
             return setting
+    
+    def get_table_setting_input(self):
+        dialog = TableSettingDialog()
+        if dialog.exec_() == QDialog.Accepted:
+            row = int(dialog.row_text_edit.toPlainText())
+            col = int(dialog.col_text_edit.toPlainText())
         
+        return row, col
+    
     def setupUi(self):
         self.setting_table()
         self.get_students()
-        self.check_cells_little_students()
         self.build_table()
         
         self.screen_share_btn.clicked.connect(self.screen_share_btn_handler)
@@ -67,32 +76,33 @@ class Page(QWidget):
         '''
         print("get students")
         
-        for i in range(30):
-            self.students.append(Student(str(i), i, i))    
-    
-    def check_cells_little_students(self):
-        return self.row * self.col < len(self.students)       
+        for i in range(10):
+            self.students[0] = Student("ip", "port", "name")
 
     def build_table(self):
         '''
         학생 자리 테이블을 생성한다.
         '''
         print("start table building")
+        index = 0
         
         for i in range(self.row):
             for j in range(self.col):
-                cell = Cell(str(i), str(j))
-                self.student_table.setCellWidget(i, j, cell)
+                item = TableItem((i, j))
+                if self.students[index]:
+                    student = self.students[index]
+                    item.add_student_info(student)
+                
+                self.student_table.setCellWidget(i, j, item)
                 
     def screen_share_btn_handler(self):
-        self.build_screen_share_page()
         if self.screen_share_btn.text() == "화면 공유 시작":
-            self.start_screen_share()
+            self.teacher_service.start_screen_share()
             self.screen_share_btn.setText("화면 공유 중지")
         else:
-            self.stop_screen_share()
+            self.teacher_service.stop_screen_share()
             self.screen_share_btn.setText("화면 공유 시작")
-
+                
     def start_screen_share(self):  # TODO 화면 공유 시작 작성
         print("화면 공유 시작")
 
@@ -101,7 +111,7 @@ class Page(QWidget):
         
     def setting_btn_handler(self):
         print("setting btn clicked")
-        dialog = TableDialog()
+        dialog = TableSettingDialog()
         if dialog.exec_() == QDialog.Accepted:
             self.row = int(dialog.row_text_edit.toPlainText())
             self.col = int(dialog.col_text_edit.toPlainText())
@@ -124,6 +134,12 @@ class Page(QWidget):
         '''
         self.right_click_pos = event.pos()
         
+        index = self.student_table.indexAt(self.right_click_pos)
+        row = index.row()
+        col = index.column()
+        
+        table_item = self.student_table.cellWidget(row, col)
+        
         # 컨텍스트 메뉴 생성
         context_menu = QMenu(self)
         
@@ -133,9 +149,9 @@ class Page(QWidget):
         remote_controll_action = QAction("원격제어", self)
         
         # 동작을 수행하는 함수 연결 (여기서는 예시로 메시지 박스 출력)
-        disable_action.triggered.connect(self.disable_triggered_handler)
-        enable_action.triggered.connect(self.enable_triggered_handler)
-        remote_controll_action.triggered.connect(self.remote_controll_triggered_handler)
+        disable_action.triggered.connect(self.disable_triggered_handler(table_item))
+        enable_action.triggered.connect(self.enable_triggered_handler(table_item))
+        remote_controll_action.triggered.connect(self.remote_controll_triggered_handler(table_item))
         
         # 동작을 컨텍스트 메뉴에 추가
         context_menu.addAction(disable_action)
@@ -145,33 +161,22 @@ class Page(QWidget):
         # 컨텍스트 메뉴 표시
         context_menu.exec_(self.mapToGlobal(event.pos()))
             
-    def disable_triggered_handler(self):
-        index = self.student_table.indexAt(self.right_click_pos)
-        row = index.row()
-        col = index.column()
-        
-        cell = self.student_table.cellWidget(row, col)
-        
-        cell.hide()
+    def disable_triggered_handler(self, table_item):
+        table_item.hide()
+        row, col = table_item.getPos()
         self.cells[row][col] = False
                     
         self.right_click_pos = None
         
-    def enable_triggered_handler(self):
-        index = self.student_table.indexAt(self.right_click_pos)
-        row = index.row()
-        col = index.column()
-        
-        cell = self.student_table.cellWidget(row, col)
-        
-        cell.show()
+    def enable_triggered_handler(self, table_item):      
+        table_item.show()
+        row, col = table_item.getPos()
         self.cells[row][col] = True
                     
         self.right_click_pos = None
         
-    def remote_controll_triggered_handler(self):
-        
-        self.remote_controll()
+    def remote_controll_triggered_handler(self, student_ip):
+        self.teacher.remote_controll(student_ip)
         
     def remote_controll(self):
         print("원격제어 실행")
@@ -184,3 +189,41 @@ class Page(QWidget):
         
         with open(CONFIG_PATH, 'w') as file:
             json.dump(setting, file)
+            
+    def closeEvent(self, event):
+        super().closeEvent(event)
+        self.teacher_service.close()
+            
+class TableItem(QWidget):
+    def __init__(self, pos:tuple, ip="", name=""):
+        super().__init__()
+        uic.loadUi("./Server/ui/table_item.ui", self)
+        self.pos = pos
+        self.ip = ip
+        self.name = name
+        
+        self.setText()
+
+    def clear(self):
+        self.ip = ""
+        self.name = ""
+        self.setText()
+        
+    def add_student_info(self, student:Student):
+        self.ip = student.get_ip()
+        self.name = student.get_name()
+        
+    def setText(self):
+        self.ip_label.setText(self.ip)
+        self.name_label.setText(self.name)
+    
+    def getPos(self):
+        return self.pos
+    
+class TableSettingDialog(QDialog):
+    def __init__(self, parent:QWidget=None):
+        super().__init__(parent)
+        uic.loadUi("./Server/ui/setConfig.ui", self)
+        self.setWindowTitle("Table Setting")
+        self.buttonBox.accepted.connect(super().accept)
+        self.buttonBox.rejected.connect(super().reject)

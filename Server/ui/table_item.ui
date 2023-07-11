@@ -35,7 +35,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="number">
+      <widget class="QLabel" name="name_label">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -54,7 +54,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="ip">
+      <widget class="QLabel" name="ip_label">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>

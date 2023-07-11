@@ -1,12 +1,12 @@
 import sys
-from PyQt5 import uic
+from PyQt5 import QtGui, uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from domain import *
-from domain.pages import FirstPage
+from page import SupervisionPage
 
-form_class = uic.loadUiType("./ui/main.ui")[0]
+form_class = uic.loadUiType("./Server/ui/main.ui")[0]
 
 class Main(QMainWindow, form_class):
     def __init__(self):
@@ -18,9 +18,14 @@ class Main(QMainWindow, form_class):
     def setupUi(self):
         super().setupUi(self)
         
-        self.fir_page = FirstPage.Page()
+        self.fir_page = SupervisionPage()
         
         self.stackedWidget.addWidget(self.fir_page)
+        
+    def closeEvent(self, event) -> None:
+        super().closeEvent(event)
+        self.fir_page.close()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
