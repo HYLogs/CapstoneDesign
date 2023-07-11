@@ -1,7 +1,9 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
+from PyQt5.QtCore import QCoreApplication
 import os
+import threading
 
 from modules.Service.StudentService import StudentService
 
@@ -51,6 +53,7 @@ class WindowClass(QMainWindow, form_class) :
         result = msgbox.exec_()
 
         if result == 0:
+            self.showMinimized()
             self.showRemoteScreen()
 
     def backHome(self):
