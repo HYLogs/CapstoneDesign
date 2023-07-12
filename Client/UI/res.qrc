@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="file">
+    <file>closeButton.png</file>
+    <file>maximizeButton.png</file>
+    <file>minimizeButton.png</file>
     <file>HKbackgroundImgColor.png</file>
     <file>SuccessState.png</file>
     <file>HKbackgroundImg.png</file>

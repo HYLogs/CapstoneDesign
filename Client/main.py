@@ -1,6 +1,10 @@
 import sys
+
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
+from PyQt5 import QtCore
+from PyQt5.QtGui import QIcon, QCursor
 import os
 
 from modules.Service.StudentService import StudentService
@@ -20,10 +24,16 @@ class WindowClass(QMainWindow, form_class) :
         self.setUi()
         self.setData()
 
-
     def setUi(self):
         self.setupUi(self)
 
+        # 상단 바 제거
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)  # 테두리 제거
+        self.pushButton_close.clicked.connect(self.close)
+        self.pushButton_Max.clicked.connect(lambda : self.showMaximized())
+        self.pushButton_Min.clicked.connect(lambda : self.showMinimized())
+
+        # 페이지 불러오기
         self.first = First()
         self.stackedWidget.addWidget(self.first)
         self.second = Second()
@@ -31,15 +41,16 @@ class WindowClass(QMainWindow, form_class) :
         self.third = Third()
         self.stackedWidget.addWidget(self.third)
 
+        # Home 버튼 이번트
         self.first.remoteButton.clicked.connect(self.remoteBtnClick)
         self.first.scrshrButton.clicked.connect(self.scrshrBtnClick)
 
+        # Home으로 돌아가기 버튼 이벤트
         self.second.remoteControlQuitButton.clicked.connect(self.backHome)
         self.third.screenShareQuitButton.clicked.connect(self.backHome)
 
     def setData(self):
         self.connect_label.setText(str(self.SService.student))
-
 
     def remoteBtnClick(self):
         msgbox = QMessageBox(self.centralwidget)
@@ -51,6 +62,7 @@ class WindowClass(QMainWindow, form_class) :
         result = msgbox.exec_()
 
         if result == 0:
+            self.showMinimized()
             self.showRemoteScreen()
 
     def backHome(self):
@@ -62,11 +74,27 @@ class WindowClass(QMainWindow, form_class) :
     def showRemoteScreen(self):
         self.stackedWidget.setCurrentIndex(1)
         self.second.remoteControlQuitButton.clicked.connect(self.SService.closeRemote)
-        remoteScreen = self.second.screen
-        self.SService.sendRemote(remoteScreen)
+        self.SService.sendRemote(self.second.screen)
 
     def closeEvent(self, QCloseEvent):
-        self.SService.closeEvent()
+        self.SService.closeRemote()
+
+    # MOUSE Click drag EVENT function
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.offset = event.pos()
+        else:
+            super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.offset is not None and event.buttons() == QtCore.Qt.LeftButton:
+            self.move(self.pos() + event.pos() - self.offset)
+        else:
+            super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self.offset = None
+        super().mouseReleaseEvent(event)
 
 
 class First(QWidget):
