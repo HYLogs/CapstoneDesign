@@ -2,9 +2,7 @@ import sys
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
-from PyQt5 import uic
-from PyQt5 import QtCore
-from PyQt5.QtGui import QIcon, QCursor
+from PyQt5 import uic, QtCore
 import os
 
 from modules.Service.StudentService import StudentService
@@ -27,11 +25,14 @@ class WindowClass(QMainWindow, form_class) :
     def setUi(self):
         self.setupUi(self)
 
+        # QSizeGrip 위젯 생성
+        size_grip = QSizeGrip(self.centralwidget)
+
         # 상단 바 제거
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)  # 테두리 제거
         self.pushButton_close.clicked.connect(self.close)
-        self.pushButton_Max.clicked.connect(lambda : self.showMaximized())
-        self.pushButton_Min.clicked.connect(lambda : self.showMinimized())
+        self.pushButton_Max.clicked.connect(lambda: self.maximizeButton())
+        self.pushButton_Min.clicked.connect(lambda: self.showMinimized())
 
         # 페이지 불러오기
         self.first = First()
@@ -76,43 +77,47 @@ class WindowClass(QMainWindow, form_class) :
         self.second.remoteControlQuitButton.clicked.connect(self.SService.closeRemote)
         self.SService.sendRemote(self.second.screen)
 
+    def maximizeButton(self):
+        if self.pushButton_Max.isChecked():
+            self.showMaximized()
+        else:
+            self.showNormal()
+
     def closeEvent(self, QCloseEvent):
         self.SService.closeRemote()
 
     # MOUSE Click drag EVENT function
     def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.offset = event.pos()
+        if self.HeaderLayout.underMouse():
+            if event.button() == QtCore.Qt.LeftButton:
+                self.offset = event.pos()
         else:
             super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        if self.offset is not None and event.buttons() == QtCore.Qt.LeftButton:
-            self.move(self.pos() + event.pos() - self.offset)
+        if self.HeaderLayout.underMouse():
+            if self.offset is not None and event.buttons() == QtCore.Qt.LeftButton:
+                self.move(self.pos() + event.pos() - self.offset)
+
         else:
             super().mouseMoveEvent(event)
-
-    def mouseReleaseEvent(self, event):
-        self.offset = None
-        super().mouseReleaseEvent(event)
-
 
 class First(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi(BASE_DIR + r"\uis\home_Qwidget.ui", self)
+        uic.loadUi(BASE_DIR + r"\UI\home_Qwidget.ui", self)
 
 
 class Second(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi(BASE_DIR + r"\uis\remote_control.ui", self)
+        uic.loadUi(BASE_DIR + r"\UI\remote_control.ui", self)
 
 
 class Third(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi(BASE_DIR + r"\uis\screen_share.ui", self)
+        uic.loadUi(BASE_DIR + r"\UI\screen_share.ui", self)
 
 
 if __name__ == "__main__":

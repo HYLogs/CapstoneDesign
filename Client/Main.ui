@@ -157,13 +157,16 @@ QPushButton:hover {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="UI/res.qrc">
+          <iconset resource="resource/res.qrc">
            <normaloff>:/file/minimizeButton.png</normaloff>:/file/minimizeButton.png</iconset>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton_Max">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="minimumSize">
           <size>
            <width>30</width>
@@ -184,8 +187,16 @@ QPushButton:hover {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="UI/res.qrc">
-           <normaloff>:/file/maximizeButton.png</normaloff>:/file/maximizeButton.png</iconset>
+          <iconset>
+           <activeoff>:/file/maximizeButton.png</activeoff>
+           <activeon>:/file/minimize.png</activeon>
+          </iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -217,7 +228,7 @@ QPushButton:hover {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="UI/res.qrc">
+          <iconset resource="resource/res.qrc">
            <normaloff>:/file/closeButton.png</normaloff>:/file/closeButton.png</iconset>
          </property>
         </widget>
@@ -267,7 +278,7 @@ font-weight:600;
   </widget>
  </widget>
  <resources>
-  <include location="UI/res.qrc"/>
+  <include location="resource/res.qrc"/>
  </resources>
  <connections/>
 </ui>
