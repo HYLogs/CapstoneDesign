@@ -9,36 +9,33 @@ import numpy as np
 class TeacherService():
     def __init__(self, teacher: Teacher) -> None:
         self.teacher = teacher
-        self.capture = Capture()
         self.broadcaster = Broadcaster(teacher.get_ip(), 80)
-        self.trigger = True
+        self.screen_share_continue = True
     
     def start_screen_share(self):
         print("start screen share")
-        t = threading.Thread(target=self.back_tread_screen_share)
+        t = threading.Thread(target=self.back_thread_screen_share)
         t.start()
     
-    def back_tread_screen_share(self):
-        self.trigger = True
-        self.capture.start_capture()
+    def back_thread_screen_share(self):
+        self.screen_share_continue = True
         
-        image = None
+        # TODO 화면 캡쳐
         
-        while self.trigger:
-            sleep(1)
-            print("broad casting")
-            if len(self.capture.stream) > 0:
-                image = self.capture.stream.pop(0)
-
-            if image is None:
-                continue
-
-            encoded_image = self.encode_image(image)
-            
-                # TODO 이미지 브로드 캐스팅
-            self.broadcaster.broadcast(encoded_image)
+        while self.screen_share_continue:
+            image = pyautogui.screenshot()
+            print(type(image))
+        
+        # TODO 캡쳐 이미지 브로드캐스팅
             
     def encode_image(self, image):
+        '''
+        Encoding image for broadcasting
+        Args: 
+            image: Image to be encoded
+        Returns:
+            encoded_image: Encoded Image
+        '''
         buffer = BytesIO()
         image.save(buffer, format="GIF")
         encoded_image = buffer.getvalue()
@@ -46,13 +43,17 @@ class TeacherService():
         return encoded_image
             
     def stop_screen_share(self):
-        self.capture.stop_capture()
-        self.trigger = False
+        self.screen_share_continue = False
     
-    def remote_controll(self, student):
+    def remote_controll(self, ip):
+        print("remote_controll start")
         pass
     
+    def stop_remote_controll(self):
+        print("stop_remote controll")
+    
     def close(self):
-        self.capture.stop_capture()
+        self.stop_screen_share()
+        self.stop_remote_controll()
     
     

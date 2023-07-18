@@ -9,12 +9,16 @@ class Student():
         self.ip = ip
         self.port = port
         self.name = name
+        self.disable = False
         
     def get_ip(self):
         return self.ip
     
     def get_name(self):
         return self.name
+    
+    def set_disabled(self, a:bool):
+        self.disable = a
     
 class Teacher():
     def __init__(self) -> None:
@@ -30,20 +34,3 @@ class Teacher():
     
     def get_ip(self) -> int:
         return self.ip
-    
-class Capture():
-    def __init__(self, stream = []) -> None:
-        self.stream = stream
-        self.trigger = True
-        
-    def start_capture(self):
-        t = Thread(target=self.capture)
-        t.start()
-            
-    def capture(self):
-        while self.trigger:
-            self.stream.append(pyautogui.screenshot())
-            
-    def stop_capture(self):
-        self.trigger = False
-        
