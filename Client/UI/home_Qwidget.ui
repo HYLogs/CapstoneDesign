@@ -6,12 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>670</width>
-    <height>461</height>
+    <width>552</width>
+    <height>351</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget {
+	background-color: white;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -57,7 +65,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="UI/res.qrc">:/file/SuccessState.png</pixmap>
+          <pixmap resource="../resource/res.qrc">:/file/SuccessState.png</pixmap>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -87,6 +95,23 @@
            <height>0</height>
           </size>
          </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton{
+	color: white;
+	background-color: rgb(119, 120, 110);
+	border-radius: 5px;
+	font: 10pt &quot;Malgun Gothic&quot;;
+	font-weight: bold;
+}
+QPushButton:hover {
+	color: rgb(119, 120, 110);
+	background-color: white;
+	border: 2px solid rgb(119, 120, 110);
+	border-radius: 5px;
+	font: 10pt &quot;Malgun Gothic&quot;;
+	font-weight: bold;
+}</string>
+         </property>
          <property name="text">
           <string>원격제어 요청</string>
          </property>
@@ -111,6 +136,23 @@
            <width>120</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton{
+	color: white;
+	background-color: rgb(119, 120, 110);
+	border-radius: 5px;
+	font: 10pt &quot;Malgun Gothic&quot;;
+	font-weight: bold;
+}
+QPushButton:hover {
+	color: rgb(119, 120, 110);
+	background-color: white;
+	border: 2px solid rgb(119, 120, 110);
+	border-radius: 5px;
+	font: 10pt &quot;Malgun Gothic&quot;;
+	font-weight: bold;
+}</string>
          </property>
          <property name="text">
           <string>공유 화면 보기</string>
@@ -248,8 +290,13 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_remote">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">QLabel {
+	background-color: rgba(0, 0, 0, 0)
+}</string>
           </property>
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;Remote&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -258,6 +305,14 @@
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="label_and">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string>QLabel {
+	background-color: rgba(0, 0, 0, 0)
+}</string>
+          </property>
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;And&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -265,6 +320,14 @@
         </item>
         <item row="5" column="0">
          <widget class="QLabel" name="label_screenShare">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string>QLabel {
+	background-color: rgba(0, 0, 0, 0)
+}</string>
+          </property>
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;Screen Share&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -272,6 +335,14 @@
         </item>
         <item row="7" column="0">
          <widget class="QLabel" name="label_onBrowser">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string>QLabel {
+	background-color: rgba(0, 0, 0, 0)
+}</string>
+          </property>
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;On MY PC&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -372,7 +443,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="UI/res.qrc"/>
+  <include location="../resource/res.qrc"/>
  </resources>
  <connections/>
 </ui>
