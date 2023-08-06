@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1115</width>
-    <height>614</height>
+    <width>886</width>
+    <height>532</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,12 +32,12 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QHBoxLayout" name="body_header" stretch="1,10,1">
+      <layout class="QHBoxLayout" name="bodyHeader" stretch="1,10,1">
        <property name="spacing">
         <number>0</number>
        </property>
        <item>
-        <widget class="QPushButton" name="screen_share_btn">
+        <widget class="QPushButton" name="screenShareBtn">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -63,7 +63,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="setting_btn">
+        <widget class="QPushButton" name="changeBatchBtn">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -71,7 +71,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>환경설정</string>
+          <string>배치 변경</string>
          </property>
         </widget>
        </item>
@@ -108,7 +108,84 @@
           </spacer>
          </item>
          <item>
-          <widget class="QTableWidget" name="student_table"/>
+          <widget class="QTableWidget" name="studentTable">
+           <property name="contextMenuPolicy">
+            <enum>Qt::ActionsContextMenu</enum>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Sunken</enum>
+           </property>
+           <property name="verticalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="sizeAdjustPolicy">
+            <enum>QAbstractScrollArea::AdjustIgnored</enum>
+           </property>
+           <property name="autoScroll">
+            <bool>false</bool>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="tabKeyNavigation">
+            <bool>false</bool>
+           </property>
+           <property name="dragEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="dragDropOverwriteMode">
+            <bool>false</bool>
+           </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::InternalMove</enum>
+           </property>
+           <property name="defaultDropAction">
+            <enum>Qt::TargetMoveAction</enum>
+           </property>
+           <property name="textElideMode">
+            <enum>Qt::ElideMiddle</enum>
+           </property>
+           <property name="showGrid">
+            <bool>true</bool>
+           </property>
+           <property name="rowCount">
+            <number>7</number>
+           </property>
+           <property name="columnCount">
+            <number>6</number>
+           </property>
+           <attribute name="horizontalHeaderVisible">
+            <bool>true</bool>
+           </attribute>
+           <attribute name="horizontalHeaderCascadingSectionResizes">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="horizontalHeaderStretchLastSection">
+            <bool>false</bool>
+           </attribute>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <column/>
+           <column/>
+           <column/>
+           <column/>
+           <column/>
+           <column/>
+          </widget>
          </item>
          <item>
           <spacer name="verticalSpacer_2">
