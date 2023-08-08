@@ -1,10 +1,11 @@
 import sys
-from PyQt5 import QtGui, uic
+from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from domain import *
 from page import *
+from Broadcast import *
 
 form_class = uic.loadUiType("ui/main.ui")[0]
 
@@ -18,9 +19,12 @@ class Main(QMainWindow, form_class):
         self.REMOTE_PAGE = 2
         
         self.setting_path = setting_path
+        self.setting = None
+        self.teacher = Teacher()
         
-        self.teacher_service = TeacherService(Teacher())
-
+        self.teacher_service = TeacherService(self.teacher)
+        self.broadcaster = BroadcastServer(self.teacher.ip, 1919)
+        self.broadcaster.start()
         self.setupUi()
         self.show()
         
@@ -32,12 +36,13 @@ class Main(QMainWindow, form_class):
         self.table_size = (7, 6)
         self.disables = []
         
-        if self.load_setting(self.setting_path):
-            start_page_index = self.COMMAND_PAGE
-        
         self.page1 = TableSettingPage(self)
         self.page2 = SupervisionPage(self)
         self.page3 = RemoteControllPage(self)
+        
+        if self.load_setting(self.setting_path):
+            start_page_index = self.COMMAND_PAGE
+            self.page2.setupUi()
         
         self.stackedWidget.addWidget(self.page1)
         self.stackedWidget.addWidget(self.page2)
@@ -50,6 +55,7 @@ class Main(QMainWindow, form_class):
         if os.path.exists(path):
             with open(path, 'r') as file:
                 setting = json.load(file)
+            self.setting = setting
             self.table_size = setting["table_size"]
             self.disables = setting["disables"]
             return True
@@ -60,7 +66,10 @@ class Main(QMainWindow, form_class):
             self.page2.studentTable.clear()
             self.page2.setupUi()
             
-    def to_table_setting_page(self):
+    def to_table_setting_page(self):   
+        if self.setting is not None:
+            self.page1.apply_setting(self.setting)
+            self.page1.build_table()  
         self.stackedWidget.setCurrentIndex(self.SETTING_PAGE)
         
     def to_command_page(self):

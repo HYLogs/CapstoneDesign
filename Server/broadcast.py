@@ -1,95 +1,80 @@
-import socket
-import threading
+from socket import *
 import time
+import threading
 
-# event 형식으로 변경
-
-class Broadcaster:
+class BroadcastServer:
+    students = dict()
+    
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
-        self.listeners = set()
-        self.lock = threading.Lock()
-        self.event = threading.Event()
-
-    def add_listener(self, listener):
-        with self.lock:
-            self.listeners.add(listener)
-
-    def remove_listener(self, listener):
-        with self.lock:
-            self.listeners.remove(listener)
-
-    def broadcast(self, message):
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            try:
-                sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                sock.sendto(message, (self.ip, self.port))
-                print('successfully send message!')
+        self.broadcastAddr = self.setBoroadcastAddr()
+        
+    def setBoroadcastAddr(self):
+        host = self.ip.split(".")
+        host[3] = "255"
+        host = ".".join(host)
+        return host
+        
+    def start(self):  
+        t = threading.Thread(target=self.sendIP)
+        t.start()
+        
+        t = threading.Thread(target=self.recvIP)
+        t.start()
+    
+    def sendIP(self):
+        sock = socket(AF_INET, SOCK_DGRAM)
+        sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        while True:
+            BroadcastServer.students = dict()
+            sock.sendto(self.ip.encode('utf-8'), (self.broadcastAddr, self.port))
+            time.sleep(5)
             
-            except socket.error:
-                print('error: ', socket.error)
-                sock.close()
+    def recvIP(self):
+        host = "0.0.0.0"
+        
+        sock = socket(AF_INET, SOCK_DGRAM)
+        sock.bind((host, self.port))
+        while True:
+            data, address = sock.recvfrom(1024)
+            if (address[0] == self.ip): continue
+            
+            BroadcastServer.students[data.decode('utf-8')] = address[0]
+            print(BroadcastServer.students)
 
 
-    def start(self, duration, message):
-        self.event.clear()
-        end_time = time.time() + duration
-
-        while not self.event.is_set() and time.time() < end_time:
-            self.broadcast(message)
-            time.sleep(1)
-
-        self.event.set()
-
-class Listener(threading.Thread):
-    def __init__(self, name, ip, port):
-        super().__init__()
-        self.name = name
-        self.ip = ip
+class BroadcastClient:
+    serverIP = ""
+    
+    def __init__(self, port):
+        self.host = "0.0.0.0"
         self.port = port
-        self.event = threading.Event()
 
-    def run(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            sock.bind((self.ip, self.port))
-            sock.settimeout(1)
+    def start(self):
+        t = threading.Thread(target=self.recvReturnInfo)
+        t.start()
+    
+    def recvReturnInfo(self):
+        sock = socket(AF_INET, SOCK_DGRAM)
+        name = gethostname()
+        sock.bind((self.host, self.port))
 
-            while not self.event.is_set():
-                try:
-                    data, _ = sock.recvfrom(1024)
-                    message = data.decode('utf-8')
-                    print(f"{self.name} received message: {message}")
-                except socket.timeout:
-                    continue
+        while True:
+            data, address = sock.recvfrom(1024)
+            BroadcastClient.serverIP = data.decode('utf-8')
 
-    def stop(self):
-        self.event.set()
+            sock.sendto(name.encode('utf-8'), (BroadcastClient.serverIP, self.port))
+            print(name)
+            
+            
+# How to using
 
-# # IP 주소와 포트를 설정합니다.
-# SERVER_ADDRESS = '221.147.245.107' # 전송측
-# CLIENT_ADDRESS = '221.147.245.211' # 수신측
-# PORT = 100
-# message = 'Hello World!'
+# Server
+# bServer = BroadcastServer("172.30.1.56", 2000) # serverPC IP, PORT
+# bServer.start()
+# BroadcastServer.students # get connected Client PCs Ip
 
-# # Broadcaster 객체를 생성합니다.
-# broadcaster = Broadcaster(CLIENT_ADDRESS, PORT)
-
-# # Listener 객체를 생성하고 Broadcaster에 추가합니다.
-# listener1 = Listener("Listener 1", SERVER_ADDRESS, PORT)
-# listener1.start()
-# broadcaster.add_listener(listener1)
-
-# # 브로드캐스트를 시작합니다.
-# duration = 5
-# broadcaster.start(duration, message)
-
-# # 일정 시간이 지나면 통신을 종료합니다.
-# time.sleep(duration)
-# broadcaster.event.set()
-
-# # 리스너를 종료합니다.
-# listener1.stop()
-# listener1.join()
-
+# Client
+# bClient = BroadcastClient(2000) # serverPC PORT
+# bClient.start() 

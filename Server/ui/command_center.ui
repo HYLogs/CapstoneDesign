@@ -15,13 +15,13 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
-    <number>0</number>
+    <number>6</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>6</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
@@ -93,7 +93,7 @@
         </spacer>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout" stretch="1,14,1">
+        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
          <item>
           <spacer name="verticalSpacer">
            <property name="orientation">
@@ -110,7 +110,7 @@
          <item>
           <widget class="QTableWidget" name="studentTable">
            <property name="contextMenuPolicy">
-            <enum>Qt::ActionsContextMenu</enum>
+            <enum>Qt::NoContextMenu</enum>
            </property>
            <property name="frameShape">
             <enum>QFrame::StyledPanel</enum>
@@ -136,6 +136,9 @@
            <property name="tabKeyNavigation">
             <bool>false</bool>
            </property>
+           <property name="showDropIndicator" stdset="0">
+            <bool>false</bool>
+           </property>
            <property name="dragEnabled">
             <bool>true</bool>
            </property>
@@ -146,7 +149,10 @@
             <enum>QAbstractItemView::InternalMove</enum>
            </property>
            <property name="defaultDropAction">
-            <enum>Qt::TargetMoveAction</enum>
+            <enum>Qt::MoveAction</enum>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
            </property>
            <property name="textElideMode">
             <enum>Qt::ElideMiddle</enum>

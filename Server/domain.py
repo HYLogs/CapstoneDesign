@@ -5,10 +5,11 @@ from PyQt5.QtWidgets import *
 from threading import Thread
 
 class Student():
-    def __init__(self, ip:str, port:str, name:str):
+    def __init__(self, ip:str, port:str, name:str, detail:str):
         self.ip = ip
         self.port = port
         self.name = name
+        self.detail = detail
         self.disable = False
         
     def get_ip(self):
@@ -16,6 +17,9 @@ class Student():
     
     def get_name(self):
         return self.name
+    
+    def get_detail(self):
+        return self.detail
     
     def set_disabled(self, a:bool):
         self.disable = a
@@ -31,6 +35,3 @@ class Teacher():
         s.close()
         name = socket.gethostname()
         return ip, name
-    
-    def get_ip(self) -> int:
-        return self.ip

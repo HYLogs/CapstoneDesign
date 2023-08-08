@@ -1,13 +1,14 @@
-from typing import Tuple, List
+from typing import List
 from PyQt5.QtWidgets import *
-from PyQt5 import uic, QtCore
+from PyQt5 import uic
 from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import Qt, QSize, QPoint, pyqtSlot
+from PyQt5.QtCore import Qt, QSize, pyqtSlot
 
 from domain import *
 from service import *
 from page import *
+from customWidget import *
 
 import os
 
@@ -34,12 +35,12 @@ class SupervisionPage(QWidget):
         
         self.setting_table()
         self.build_table()
-        self.set_table_context_menu()
         
         self.screenShareBtn.pressed.connect(self.screen_share_btn_handler)
         self.changeBatchBtn.pressed.connect(self.change_batch_btn_handler)
 
     def setting_table(self):
+        print("setting page")
         row, col = self.main.table_size
         
         # 테이블 행열 크기 설정
@@ -49,23 +50,6 @@ class SupervisionPage(QWidget):
         # 테이블 빈공간 없애기
         self.studentTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.studentTable.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
-    
-    def set_table_context_menu(self):
-        self.studentTable.customContextMenuRequested.connect(self.context_menu)
-        
-        show_detail_action = QAction("상세정보", self.studentTable)
-        
-        self.studentTable.addAction(show_detail_action)
-        
-        show_detail_action.triggered.connect(self.show_detail)
-        
-    @pyqtSlot(QPoint)
-    def context_menu(self, position):
-        menu = QMenu()
-        
-        
-    def show_detail(self, event):
-        print(type(event))
 
     def get_students(self): # TODO 통신을 통해 학생의 데이터를 받아온다.
         '''
@@ -86,13 +70,19 @@ class SupervisionPage(QWidget):
         
         for i in range(row):
             for j in range(col):
-                item = TableItem([i, j])
+                student = Student(f"192.168.1.{index}", f"8080", f"E303_COM{index}", f"{index}번 PC입니다.")
+                
+                index += 1
                 
                 if [i, j] not in self.disables:
+                    item = TableItem(self.studentTable, student)
                     if index < len(self.students):
                         index += 1
                 else:
-                    item.setDisabled(True)
+                    item = TableItem(self.studentTable)
+                    # TODO 자리가 비활성화인 경우
+                    pass
+                    # item.setDisabled(True)
                 
                 self.studentTable.setCellWidget(i, j, item)
                 
@@ -116,80 +106,13 @@ class SupervisionPage(QWidget):
     def change_batch_btn_handler(self):
         self.main.to_table_setting_page()
         
-    def table_mouse_press_handler(self, event):
-        if event.button() == QtCore.Qt.RightButton:
-            self.table_right_mouse_press_handler(event)
-            
-    def table_right_mouse_press_handler(self, event):
-        '''
-        테이블에서 우클릭 시 컨텍스트 메뉴를 표시한다.
-        '''
-        self.right_click_pos = event.pos()
-        
-        # 컨텍스트 메뉴 생성
-        context_menu = QMenu(self)
-        
-        remote_controll_action = QAction("원격제어", self)
-
-        remote_controll_action.triggered.connect(self.remote_controll_triggered_handler)
-        
-        context_menu.addAction(remote_controll_action)
-        
-        # 컨텍스트 메뉴 표시
-        context_menu.exec_(self.mapToGlobal(event.pos()))
-        
-    def remote_controll_triggered_handler(self):
-        table_item = self.get_event_target()
-        self.main.teacher_service.remote_controll(table_item.ip)
-        
-        self.main.to_remote_page()
-        
-    def get_event_target(self):
-        index = self.studentTable.indexAt(self.right_click_pos)
-        row = index.row()
-        col = index.column()
-        table_item = self.studentTable.cellWidget(row, col)
-        return table_item
-        
-    def remote_controll(self):
-        print("원격제어 실행")
-        
     def closeEvent(self, event):
         super().closeEvent(event)
         self.teacher_service.close()
-            
-class TableItem(QWidget):
-    def __init__(self, pos:list, ip="", name=""):
-        super().__init__()
-        uic.loadUi("ui/table_item.ui", self)
-        self.pos = pos
-        self.ip = ip
-        self.name = name
-        self.disable = False
         
-        self.setText()
-
-    def clear(self):
-        self.ip = ""
-        self.name = ""
-        self.setText()
-        
-    def setDisabled(self, a0: bool) -> None:
-        super().setDisabled(a0)
-        self.disable = a0
-        
-    def add_student_info(self, student:Student):
-        self.ip = student.get_ip()
-        self.name = student.get_name()
-        
-        self.setText()
-        
-    def setText(self):
-        self.ip_label.setText(self.ip)
-        self.name_label.setText(self.name)
-    
-    def get_pos(self):
-        return self.pos
+    def dragEnterEvent(self, a0: QDragEnterEvent) -> None:
+        print("drag")
+        return super().dragEnterEvent(a0)
         
 class RemoteControllPage(QWidget):
     def __init__(self, parent) -> None:
@@ -219,8 +142,9 @@ class TableSettingPage(QWidget):
         
         self.main = parent
         self.disable_pos = parent.disables
+        self.table_size = parent.table_size
 
-        self.build_table(*parent.table_size)
+        self.build_table()
         
         self.addRowBtn.pressed.connect(self.add_row)
         self.rmRowBtn.pressed.connect(self.rm_row)
@@ -232,7 +156,9 @@ class TableSettingPage(QWidget):
         self.resetBtn.pressed.connect(self.reset_btn_handler)
         self.saveBtn.pressed.connect(self.save_btn_handler)
 
-    def build_table(self, row:int = 7, col:int = 6) -> None:
+    def build_table(self) -> None:
+        row, col = self.table_size
+        
         self.table.setRowCount(row)
         self.table.setColumnCount(col)
         
@@ -252,7 +178,7 @@ class TableSettingPage(QWidget):
             for j in range(col):
                 cell = QTableWidgetItem()
 
-                if (i, j) not in self.disable_pos:
+                if [i, j] not in self.disable_pos:
                     icon = self.make_icon()
                     cell.setIcon(icon)
                 self.table.setItem(i, j, cell)
@@ -269,6 +195,7 @@ class TableSettingPage(QWidget):
         
     def add_row(self) -> None:
         self.table.setRowCount(self.table.rowCount() + 1)
+        self.table_size[0] += 1
         self.build_table(self.table.rowCount(), self.table.columnCount())
         
     def rm_row(self) -> None:
@@ -277,12 +204,14 @@ class TableSettingPage(QWidget):
             print("행이 최소 1 이상이어야 합니다.")
             return
         self.table.removeRow(index)
+        self.table_size[0] -= 1
         self.resize_table()
         self.build_table(self.table.rowCount(), self.table.columnCount())
         
     def add_col(self) -> None:
         self.table.setColumnCount(self.table.columnCount() + 1)
-        self.build_table(self.table.rowCount(), self.table.columnCount())
+        self.table_size[1] += 1
+        self.build_table()
         
     def rm_col(self) -> None:
         index = self.table.columnCount() - 1
@@ -290,8 +219,9 @@ class TableSettingPage(QWidget):
             print("행이 최소 1 이상이어야 합니다.")
             return
         self.table.removeColumn(index)
+        self.table_size[1] -= 1
         self.resize_table()
-        self.build_table(self.table.rowCount(), self.table.columnCount())
+        self.build_table()
         
     def reset_btn_handler(self) -> None:
         self.rm_setting_file()
@@ -342,6 +272,10 @@ class TableSettingPage(QWidget):
             else:
                 self.disable_pos.remove((i, j))
                 item.setIcon(QIcon("./images/Connected.png"))
+                
+    def apply_setting(self, setting:Dict):
+        self.disable_pos = setting['disables']
+        self.table_size = setting['table_size']
                 
                 
 class IconDelegate(QStyledItemDelegate):
