@@ -5,7 +5,6 @@ from time import sleep
 from io import BytesIO
 import cv2
 import numpy as np
-import remotecontrol
 
 class TeacherService():
     def __init__(self, teacher: Teacher) -> None:
@@ -48,7 +47,6 @@ class TeacherService():
     
     def remote_controll(self, ip):
         print("remote_controll start")
-        remotecontrol.screenShareServer.connectServer(8800)
         pass
     
     def stop_remote_controll(self):
