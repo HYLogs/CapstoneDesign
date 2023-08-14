@@ -1,14 +1,37 @@
 import os
+import json
+from typing import Dict
+from utils.file import *
 
-class Configuration:
-    def __init__(self, path:str):
-        if not os.path.exists(path):
-            raise ValueError("올바른 경로가 아닙니다.")
+class Configuration(object):
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def __init__(self, path:str=None):
+        cls = type(self)
+        if not hasattr(cls, "_init"):
+            config = {}
+            
+            if os.path.exists(path):
+                self.path = path
+                config = self.load_config()
+                
+            self.config = config
+            cls._init = True
         
-        self.config_path = path
-        
-    def load_config(self, path):
-        pass
+    def load_config(self):
+        if os.path.exists(self.path):
+            with open(self.path, 'r') as file:
+                config = json.load(file)
+                return config
+        else:
+            raise ValueError("저장된 설정 파일이 없습니다.")
     
     def save_config(self):
-        pass
+        with open(self.path, 'w') as file:
+            json.dump(self.config, file)
+
+    def set_config(self, **kwargs):
+        self.config.update(kwargs)

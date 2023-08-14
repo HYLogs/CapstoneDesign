@@ -1,10 +1,6 @@
 from domain import *
-import base64
 from Broadcast import *
 from time import sleep
-from io import BytesIO
-import cv2
-import numpy as np
 
 class TeacherService():
     def __init__(self, teacher: Teacher) -> None:

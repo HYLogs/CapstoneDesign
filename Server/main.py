@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import *
 from domain import *
 from page import *
 from Broadcast import *
+import json
 
 form_class = uic.loadUiType("ui/main.ui")[0]
 
@@ -14,6 +15,8 @@ CONFIG_PATH = "./setting.json"
 class Main(QMainWindow, form_class):
     def __init__(self, setting_path):
         super().__init__()
+        self.config = Configuration(CONFIG_PATH)
+        
         self.SETTING_PAGE = 0
         self.COMMAND_PAGE = 1
         self.REMOTE_PAGE = 2

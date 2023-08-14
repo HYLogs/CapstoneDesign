@@ -1,8 +1,5 @@
 import socket
-import pyautogui
-from PyQt5 import uic
 from PyQt5.QtWidgets import *
-from threading import Thread
 
 class Student():
     def __init__(self, ip:str, port:str, name:str, detail:str):

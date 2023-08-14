@@ -12,8 +12,8 @@ from customWidget import *
 
 import os
 
-import json
 from utils.file import save_config
+from configuration import Configuration
 
 CONNECTED_ICON = "./images/Connected.png"
 
@@ -256,7 +256,9 @@ class TableSettingPage(QWidget):
                 if not self.check_enable(item):
                     disable_pos.append((i, j))
         
-        save_config(self.main.setting_path, table_size=(row, col), disables=disable_pos)
+        config = Configuration()
+        config.set_config(table_size=(row, col), disables = disable_pos)
+        config.save_config()
 
     def check_enable(self, item:QTableWidgetItem) -> bool:
         return not item.icon().isNull()

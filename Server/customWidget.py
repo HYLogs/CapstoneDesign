@@ -1,5 +1,5 @@
 from typing import *
-from PyQt5 import QtGui, uic
+from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -36,7 +36,7 @@ class TableItem(QWidget):
         
     def setupUi(self) -> None:
         pixmap = QPixmap(self.img)
-        self.label.setPixmap(pixmap)
+        self.image.setPixmap(pixmap)
         
     def set_context_menu(self):
         self.customContextMenuRequested.connect(self.show_context_menu)
