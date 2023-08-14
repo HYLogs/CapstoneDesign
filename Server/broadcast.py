@@ -18,10 +18,18 @@ class BroadcastServer:
         
     def start(self):  
         t = threading.Thread(target=self.sendIP)
+        t.daemon = True
         t.start()
         
         t = threading.Thread(target=self.recvIP)
+        t.daemon = True
         t.start()
+        
+    def stop(self):
+        sock = socket(AF_INET, SOCK_DGRAM)
+        sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        
+        sock.sendto("end".encode('utf-8'), (self.broadcastAddr, self.port))
     
     def sendIP(self):
         sock = socket(AF_INET, SOCK_DGRAM)

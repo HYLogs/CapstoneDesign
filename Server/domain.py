@@ -1,5 +1,4 @@
 import socket
-import pyautogui
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from threading import Thread
