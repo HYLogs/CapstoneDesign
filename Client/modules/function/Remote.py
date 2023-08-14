@@ -1,12 +1,9 @@
-from PyQt5 import QtGui
-from PyQt5 import QtCore
-from PyQt5.QtCore import QSize
-
-import numpy as np
-import pyautogui
-
 import cv2
-import time
+from PIL import Image
+from PyQt5.QtGui import QPixmap, QImage
+import pyautogui
+import io
+
 
 # Remote Class
 class Remote:
@@ -18,24 +15,12 @@ class Remote:
         self.stopsig = 0
 
     def startRemote(self, remoteScreen):
+        remoteScreen.setScaledContents(True)
         while self.stopsig == 0:
-            start = time.time()
+            # pixmap = self.capture()
+            # remoteScreen.setPixmap(pixmap)
 
-            frame = np.asarray(pyautogui.screenshot())
-
-            h, w, c = frame.shape
-            qImg = QtGui.QImage(frame.data, w, h, w * c, QtGui.QImage.Format_RGB888)
-            pixmap = QtGui.QPixmap.fromImage(qImg)
-            ## 출력영상을 resize해주기
-            width, height = pyautogui.size()
-            p = pixmap.scaled(QSize(width-300, height-300), QtCore.Qt.KeepAspectRatioByExpanding)
-            # remoteScreen.setPixmap(p)
             remoteScreen.setText("원격 제어 중")
-
-            delta = time.time() - start
-
-            if delta < self.SLEEP_TIME:
-                time.sleep(self.SLEEP_TIME - delta)
             cv2.waitKey(1)
 
     def closeEvent(self):
