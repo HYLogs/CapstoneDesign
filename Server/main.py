@@ -84,6 +84,7 @@ class Main(QMainWindow, form_class):
     def closeEvent(self, event) -> None:
         super().closeEvent(event)
         self.page2.close()
+        self.teacher_service.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

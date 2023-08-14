@@ -10,6 +10,12 @@
     <height>558</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -39,7 +45,7 @@
     <item row="0" column="0">
      <widget class="QGroupBox" name="HeaderLayout">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -244,6 +250,12 @@ QPushButton:hover {
     </item>
     <item row="1" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="styleSheet">
        <string notr="true">QStackedWidget {
 	background-color: white;
@@ -254,7 +266,7 @@ QPushButton:hover {
     <item row="2" column="0">
      <widget class="QLabel" name="label_Footer">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>

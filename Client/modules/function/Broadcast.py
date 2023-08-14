@@ -30,6 +30,7 @@ class BroadcastServer:
         sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         
         sock.sendto("end".encode('utf-8'), (self.broadcastAddr, self.port))
+        
     
     def sendIP(self):
         sock = socket(AF_INET, SOCK_DGRAM)
@@ -61,6 +62,7 @@ class BroadcastClient:
 
     def start(self):
         t = threading.Thread(target=self.recvReturnInfo)
+        t.daemon = True
         t.start()
     
     def recvReturnInfo(self):
@@ -70,13 +72,17 @@ class BroadcastClient:
 
         while True:
             data, address = sock.recvfrom(1024)
+            
+            if data.decode('utf-8') == "end":
+                BroadcastClient.serverIP = ""
+                continue
+            
             BroadcastClient.serverIP = data.decode('utf-8')
 
             sock.sendto(name.encode('utf-8'), (BroadcastClient.serverIP, self.port))
-            print(name)
             
             
-# How to using
+# How to use
 
 # Server
 # bServer = BroadcastServer("172.30.1.56", 2000) # serverPC IP, PORT

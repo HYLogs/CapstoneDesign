@@ -22,5 +22,6 @@ class TeacherService():
     
     def close(self):
         self.stop_remote_controll()
+        self.broadcaster.stop()
     
     

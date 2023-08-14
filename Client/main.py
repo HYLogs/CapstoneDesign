@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
 from PyQt5 import uic, QtCore
 import os
+import threading
 
 from modules.Service.StudentService import StudentService
 
@@ -44,7 +45,7 @@ class WindowClass(QMainWindow, form_class) :
 
         # Home 버튼 이번트
         self.first.remoteButton.clicked.connect(self.remoteBtnClick)
-        self.first.scrshrButton.clicked.connect(self.scrshrBtnClick)
+        self.first.scrshrButton.clicked.connect(self.scrShrBtnClick)
 
         # Home으로 돌아가기 버튼 이벤트
         self.second.remoteControlQuitButton.clicked.connect(self.backHome)
@@ -52,6 +53,10 @@ class WindowClass(QMainWindow, form_class) :
 
     def setData(self):
         self.connect_label.setText(str(self.SService.student))
+
+        t = threading.Thread(target=self.SService.findTeacher, args=(self.first.stateImg, ))
+        t.daemon = True
+        t.start()
 
     def remoteBtnClick(self):
         msgbox = QMessageBox(self.centralwidget)
@@ -69,8 +74,10 @@ class WindowClass(QMainWindow, form_class) :
     def backHome(self):
         self.stackedWidget.setCurrentIndex(0)
 
-    def scrshrBtnClick(self):
+    def scrShrBtnClick(self):
         self.stackedWidget.setCurrentIndex(2)
+        self.third.screenShareQuitButton.clicked.connect(self.SService.closeScreenShare)
+        self.SService.screenShare(self.third.screen)
 
     def showRemoteScreen(self):
         self.stackedWidget.setCurrentIndex(1)
@@ -95,17 +102,24 @@ class WindowClass(QMainWindow, form_class) :
             super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
+        num = 100
         if self.HeaderLayout.underMouse():
             if self.offset is not None and event.buttons() == QtCore.Qt.LeftButton:
-                self.move(self.pos() + event.pos() - self.offset)
+                if -num < event.pos().x() - self.offset.x() < num and -num < event.pos().y() - self.offset.y() < num:
+                    self.move(self.pos() + event.pos() - self.offset)
 
         else:
             super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self.offset = None
+        super().mouseReleaseEvent(event)
 
 class First(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi(BASE_DIR + r"\UI\home_Qwidget.ui", self)
+
 
 
 class Second(QWidget):
