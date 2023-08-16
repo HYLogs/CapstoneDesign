@@ -5,7 +5,8 @@ import threading
 class BroadcastServer:
     students = dict()
     
-    def __init__(self, ip, port):
+    def __init__(self, service, ip, port):
+        self.service = service
         self.ip = ip
         self.port = port
         self.broadcastAddr = self.setBoroadcastAddr()
@@ -18,10 +19,18 @@ class BroadcastServer:
         
     def start(self):  
         t = threading.Thread(target=self.sendIP)
+        t.daemon = True
         t.start()
         
         t = threading.Thread(target=self.recvIP)
+        t.daemon = True
         t.start()
+        
+    def stop(self):
+        sock = socket(AF_INET, SOCK_DGRAM)
+        sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        
+        sock.sendto("end".encode('utf-8'), (self.broadcastAddr, self.port))
     
     def sendIP(self):
         sock = socket(AF_INET, SOCK_DGRAM)
@@ -29,6 +38,8 @@ class BroadcastServer:
         while True:
             BroadcastServer.students = dict()
             sock.sendto(self.ip.encode('utf-8'), (self.broadcastAddr, self.port))
+            time.sleep(2)
+            self.service.update()
             time.sleep(5)
             
     def recvIP(self):
@@ -40,9 +51,9 @@ class BroadcastServer:
             data, address = sock.recvfrom(1024)
             if (address[0] == self.ip): continue
             
+            # TODO DHCP? 일정시간동안 아무 통신이 없으면 연결 끊겼다고 판단
             BroadcastServer.students[data.decode('utf-8')] = address[0]
             print(BroadcastServer.students)
-
 
 class BroadcastClient:
     serverIP = ""
