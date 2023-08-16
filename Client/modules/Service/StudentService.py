@@ -2,7 +2,7 @@ from modules.domain.Student import Student
 from modules.domain.Teacher import Teacher
 from modules.function.Remote import Remote
 from modules.function.Sticker import Sticker
-from modules.function.Socket import Client
+from modules.function.ScreenShare import ScreenShareClient
 import socket
 from modules.function.Broadcast import BroadcastClient
 
@@ -18,7 +18,7 @@ class StudentService:
         ip, name = self.findStudentInfo()
         self.student = Student(ip, name)
         self.remoteObject = Remote()
-        self.scrshrObject = Client()
+        self.scrshrObject = ScreenShareClient(2000)
         self.sticker = Sticker('img/sendingImg.gif', xy=[0, 0], on_top=True)
 
     def excuteInputEvent(self):
@@ -41,7 +41,7 @@ class StudentService:
         self.sticker.hide()
 
     def screenShare(self, shareScreen):
-        self.scrshrObject.recvScreen(shareScreen)
+        self.scrshrObject.start(shareScreen)
 
     def closeScreenShare(self):
         self.scrshrObject.closeEvent()
