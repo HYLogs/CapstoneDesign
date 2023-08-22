@@ -44,7 +44,8 @@ class StudentService:
     def screenShare(self, shareScreen):
         self.scrshrObject.start(shareScreen)
 
-    def closeScreenShare(self):
+    def closeScreenShare(self, shareScreen):
+        shareScreen.clear()
         self.scrshrObject.stopRecv()
 
     def pauseScreenShare(self):

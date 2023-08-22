@@ -73,7 +73,7 @@ class WindowClass(QMainWindow, form_class) :
     # ScreenShare
     def scrShrBtnClick(self):
         self.stackedWidget.setCurrentIndex(2)
-        self.third.screenShareQuitButton.clicked.connect(self.SService.closeScreenShare)
+        self.third.screenShareQuitButton.clicked.connect(lambda: self.SService.closeScreenShare(self.third.screen))
         self.SService.screenShare(self.third.screen)
 
     # Remote

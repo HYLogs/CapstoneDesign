@@ -124,10 +124,10 @@ class ScreenShareClient:
                         frame_count = 0
                         start_time = time.time()
 
-                pixmap = self.decodeCapture(frame)
+                    pixmap = self.decodeCapture(frame)
 
-                if self.isSetImage:
-                    screen.setPixmap(pixmap)
+                    if self.isSetImage:
+                        screen.setPixmap(pixmap)
 
     def decodeCapture(self, image):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
