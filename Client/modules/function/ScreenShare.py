@@ -135,3 +135,18 @@ class ScreenShareClient:
 
     def resumeRecv(self):
         self.isSetImage = True
+
+##  Use Example
+# import time
+# def sleepTime(second, server):
+#     time.sleep(second)
+#     server.stop()
+
+# clients = {"test1" : "172.30.1.99"}
+# server = ScreenShareServer(clients, 2000)
+
+# t = Thread(target=sleepTime, args=(10, server, ))
+# t.daemon = True
+# t.start()
+
+# server.start()
