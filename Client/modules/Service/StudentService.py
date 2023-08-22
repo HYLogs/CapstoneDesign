@@ -12,11 +12,10 @@ import time
 # Main
 class StudentService:
     student: Student
-    remoteObject: Remote
 
     def __init__(self):
         ip, name = self.findStudentInfo()
-        self.student = Student(ip, name)
+        StudentService.student = Student(ip, name)
         self.remoteObject = Remote()
         self.scrshrObject = ScreenShareClient(2000)
         self.sticker = Sticker('img/sendingImg.gif', xy=[0, 0], on_top=True)
@@ -24,6 +23,7 @@ class StudentService:
     def excuteInputEvent(self):
         return 0
 
+    # Remote
     def sendScr(self):
         return 0
 
@@ -40,12 +40,21 @@ class StudentService:
         self.remoteObject.closeEvent()
         self.sticker.hide()
 
+    # ScreenShare
     def screenShare(self, shareScreen):
         self.scrshrObject.start(shareScreen)
 
-    def closeScreenShare(self):
-        self.scrshrObject.closeEvent()
+    def closeScreenShare(self, shareScreen):
+        shareScreen.clear()
+        self.scrshrObject.stopRecv()
 
+    def pauseScreenShare(self):
+        self.scrshrObject.pauseRecv()
+
+    def resumeScreenShare(self):
+        self.scrshrObject.resumeRecv()
+
+    # Others
     def findStudentInfo(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
