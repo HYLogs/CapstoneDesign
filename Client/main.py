@@ -1,39 +1,37 @@
 import sys
 
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
 from PyQt5 import uic, QtCore
 import os
 import threading
 
 from modules.Service.StudentService import StudentService
+from modules.CustomControls.Controls import MySizeGrip
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-#UI파일 연결
-#단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
+# UI파일 연결
+# 단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 form_class = uic.loadUiType(BASE_DIR + r"\Main.ui")[0]
 
-#화면을 띄우는데 사용되는 Class 선언
+
+# 화면을 띄우는데 사용되는 Class 선언
 class WindowClass(QMainWindow, form_class) :
     def __init__(self) :
         super().__init__()
+
+        self.offset = None
         self.SService = StudentService()
 
         self.setUi()
         self.setData()
 
+    # Main
     def setUi(self):
         self.setupUi(self)
 
-        # QSizeGrip 위젯 생성
-        size_grip = QSizeGrip(self.centralwidget)
-
-        # 상단 바 제거
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)  # 테두리 제거
-        self.pushButton_close.clicked.connect(self.close)
-        self.pushButton_Max.clicked.connect(lambda: self.maximizeButton())
-        self.pushButton_Min.clicked.connect(lambda: self.showMinimized())
+        # 테두리 설정
+        self.setBorder()
 
         # 페이지 불러오기
         self.first = First()
@@ -58,6 +56,27 @@ class WindowClass(QMainWindow, form_class) :
         t.daemon = True
         t.start()
 
+    # common
+    def setBorder(self):
+        # QSizeGrip 위젯 생성
+        MySizeGrip(self.centralwidget, self.SService.pauseScreenShare, self.SService.resumeScreenShare)
+
+        # 테두리 제거
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)  # 테두리 제거
+        self.pushButton_close.clicked.connect(self.close)
+        self.pushButton_Max.clicked.connect(lambda: self.maximizeButton())
+        self.pushButton_Min.clicked.connect(lambda: self.showMinimized())
+
+    def backHome(self):
+        self.stackedWidget.setCurrentIndex(0)
+
+    # ScreenShare
+    def scrShrBtnClick(self):
+        self.stackedWidget.setCurrentIndex(2)
+        self.third.screenShareQuitButton.clicked.connect(self.SService.closeScreenShare)
+        self.SService.screenShare(self.third.screen)
+
+    # Remote
     def remoteBtnClick(self):
         msgbox = QMessageBox(self.centralwidget)
         msgbox.setWindowTitle("원격제어 요청")
@@ -71,27 +90,20 @@ class WindowClass(QMainWindow, form_class) :
             self.showMinimized()
             self.showRemoteScreen()
 
-    def backHome(self):
-        self.stackedWidget.setCurrentIndex(0)
-
-    def scrShrBtnClick(self):
-        self.stackedWidget.setCurrentIndex(2)
-        self.third.screenShareQuitButton.clicked.connect(self.SService.closeScreenShare)
-        self.SService.screenShare(self.third.screen)
-
     def showRemoteScreen(self):
         self.stackedWidget.setCurrentIndex(1)
         self.second.remoteControlQuitButton.clicked.connect(self.SService.closeRemote)
         self.SService.sendRemote(self.second.screen)
 
+    def closeEvent(self, QCloseEvent):
+        self.SService.closeRemote()
+
+    # Top bar
     def maximizeButton(self):
         if self.pushButton_Max.isChecked():
             self.showMaximized()
         else:
             self.showNormal()
-
-    def closeEvent(self, QCloseEvent):
-        self.SService.closeRemote()
 
     # MOUSE Click drag EVENT function
     def mousePressEvent(self, event):
@@ -115,11 +127,12 @@ class WindowClass(QMainWindow, form_class) :
         self.offset = None
         super().mouseReleaseEvent(event)
 
+
+# Pages
 class First(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi(BASE_DIR + r"\UI\home_Qwidget.ui", self)
-
 
 
 class Second(QWidget):
