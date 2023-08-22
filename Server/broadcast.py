@@ -3,7 +3,7 @@ import time
 import threading
 
 class BroadcastServer:
-    students = dict()
+    students = {}
     
     def __init__(self, service, ip, port):
         self.service = service
@@ -38,7 +38,7 @@ class BroadcastServer:
         while True:
             BroadcastServer.students = dict()
             sock.sendto(self.ip.encode('utf-8'), (self.broadcastAddr, self.port))
-            time.sleep(2)
+            time.sleep(5)
             self.service.update()
             time.sleep(5)
             
@@ -53,7 +53,7 @@ class BroadcastServer:
             
             # TODO DHCP? 일정시간동안 아무 통신이 없으면 연결 끊겼다고 판단
             BroadcastServer.students[data.decode('utf-8')] = address[0]
-            print(BroadcastServer.students)
+
 
 class BroadcastClient:
     serverIP = ""
@@ -76,7 +76,6 @@ class BroadcastClient:
             BroadcastClient.serverIP = data.decode('utf-8')
 
             sock.sendto(name.encode('utf-8'), (BroadcastClient.serverIP, self.port))
-            print(name)
             
             
 # How to using

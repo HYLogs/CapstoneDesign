@@ -37,6 +37,9 @@ class Configuration(Subject):
     def update(self, table_size:List[int] = [7, 6], disables_pos:List[List[int]] = []):
         self.table_size = table_size
         self.disables_pos = disables_pos
+        
+    def update_student(self, name, memo):
+        self.students[name] = memo
                 
     def exist_save(self):
         return os.path.exists(self.path)

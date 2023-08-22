@@ -4,7 +4,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt, QSize, pyqtSlot
-import threading
+from threading import Thread
 
 from domain import *
 from service import *
@@ -179,6 +179,7 @@ class SupervisionPage(QWidget, Observer):
         
         self.config = parent.config
         self.teacher_service = parent.teacher_service
+        self.teacher_service.supervision_page = self
         self.parent = parent
         
         self.right_click_pos = None
@@ -201,35 +202,19 @@ class SupervisionPage(QWidget, Observer):
         '''
         self.apply_config()
         self.resize_table()
-        
-        index = 0
+
         row, col = self.config.table_size
-                
+
+        index = 0
+
         for i in range(row):
             for j in range(col):
                 if self.check_pos(i, j):
-                    # student = self.teacher_service.find_student_by_index(index)
-                    name = f"E302COM{index+1:2d}"
-                    memo = ""
-                    if name in self.config.students.keys():
-                        memo = self.config.students[name]
-                    if index % 4 != 0:
-                        
-                        student = Student(f"192.168.1.{index + 1}", f"E302COM{index + 1:2d}", memo, True)
-                    else:
-                        student = Student(f"192.168.1.{index + 1}", f"E302COM{index + 1:2d}", memo)
-                    
-                    item = TableItem(self.studentTable, student)
+                    student = self.teacher_service.students[index]
+                    item = TableItem(self.studentTable, student, config=self.config)
+                    student.addObserver(item)
                     index += 1
                     self.studentTable.setCellWidget(i, j, item)
-                
-        if index < len(self.config.students):
-            reply = QMessageBox.information(self, "경고", "학생PC의 수가 자리에 비해 더 많습니다. 배치를 변경하시겠습니까? \
-                \n변경하지 않는다면 생략되는 학생PC가 존재할 수 있습니다!", \
-                    QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            
-            if reply == QMessageBox.Yes:
-                self.change_batch_btn_handler()
                 
     def check_pos(self, i, j):
         for row, col in self.config.disables_pos:
@@ -248,19 +233,21 @@ class SupervisionPage(QWidget, Observer):
         self.studentTable.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
                 
     def screen_share_btn_handler(self):
-        if self.screen_share_btn.text() == "화면 공유 시작":
+        if self.screenShareBtn.text() == "화면 공유 시작":
+            # t = Thread(self.teacher_service.start_screen_share())
+            # t.daemon = True
+            # t.start()
             self.teacher_service.start_screen_share()
-            self.screen_share_btn.setText("화면 공유 중지")
+            self.screenShareBtn.setText("화면 공유 중지")
         else:
             self.teacher_service.stop_screen_share()
-            self.screen_share_btn.setText("화면 공유 시작")
+            self.screenShareBtn.setText("화면 공유 시작")
         
     def change_batch_btn_handler(self):
         self.parent.to_table_setting_page()
         
     def closeEvent(self, event):
         super().closeEvent(event)
-        self.teacher_service.close()
         
         row, col = self.config.table_size
         
@@ -277,6 +264,22 @@ class SupervisionPage(QWidget, Observer):
     def notify(self):
         self.studentTable.clear()
         self.build_table()
+        
+    # def update(self):
+    #     students = self.teacher_service.students
+    #     students.sort(key=lambda x:x.name)
+        
+    #     row, col = self.config.table_size
+        
+    #     index = 0
+    #     for i in range(row):
+    #         for j in range(col):
+    #             if self.check_pos(i, j):
+    #                 item = self.studentTable.cellWidget(i, j)
+    #                 item.set_student(students[index])
+    #                 index += 1
+            
+            
         
 class RemoteControllPage(QWidget):
     def __init__(self, parent) -> None:
