@@ -24,7 +24,7 @@ class ScreenShareServer:
 
     def start(self):
         self.isSharing = True
-        t = Thread(self.threadedSendScreen())
+        t = Thread(target=self.threadedSendScreen)
         t.daemon = True
         t.start()
 
@@ -61,7 +61,7 @@ class ScreenShareServer:
     def stop(self):
         self.isSharing = False
 
-
+import time
 class ScreenShareClient:
     def __init__(self, port):
         self.isSharing: bool = False
@@ -84,6 +84,8 @@ class ScreenShareClient:
         frame_info = None
         buffer = b""
 
+        frame_count = 0
+        start_time = time.time()
         while True:
             if not self.isSharing:
                 screen.clear()  # QLabel에 빈 QPixmap을 설정하여 화면을 지웁니다.
@@ -113,12 +115,19 @@ class ScreenShareClient:
                     if frame is not None and type(frame) == np.ndarray:
                         cv2.waitKey(1)
 
+                    frame_count += 1
+                    current_time = time.time()
+                    elapsed_time = current_time - start_time
+
+                    if elapsed_time >= 1.0:  # 1초마다 프레임 수 출력
+                        print("FPS:", frame_count)
+                        frame_count = 0
+                        start_time = time.time()
+
                 pixmap = self.decodeCapture(frame)
 
                 if self.isSetImage:
                     screen.setPixmap(pixmap)
-                else:
-                    pass
 
     def decodeCapture(self, image):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
