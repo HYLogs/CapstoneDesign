@@ -1,24 +1,35 @@
 import socket
-import pyautogui
-from PyQt5 import uic
 from PyQt5.QtWidgets import *
-from threading import Thread
+from utils.ObserverPattern import *
+from utils.ObserverPattern import Observer
+from customSignal import *
 
-class Student():
-    def __init__(self, ip:str, port:str, name:str):
+class Student(Subject):
+    def __init__(self, ip:str="", name:str="", memo:str="", is_connected:bool=False):
+        self.observers = []
         self.ip = ip
-        self.port = port
         self.name = name
-        self.disable = False
+        self.memo = memo
+        self.is_connected = is_connected
+        self.signal = CustomSignal()
+        self.signal.changed.connect(self.notifyObservers)
         
-    def get_ip(self):
-        return self.ip
+    def addObserver(self, observer: Observer) -> None:
+        self.observers.append(observer)
+        
+    def removeObserver(self, observer: Observer) -> None:
+        self.observers(observer)
     
-    def get_name(self):
-        return self.name
-    
-    def set_disabled(self, a:bool):
-        self.disable = a
+    def notifyObservers(self) -> None:
+        for observer in self.observers:
+            observer.notify()
+            
+    def update(self, ip="", name="", memo=""):
+        self.ip=ip
+        self.name=name
+        self.memo=memo
+        
+        self.signal.changed.emit()
     
 class Teacher():
     def __init__(self) -> None:
@@ -31,6 +42,3 @@ class Teacher():
         s.close()
         name = socket.gethostname()
         return ip, name
-    
-    def get_ip(self) -> int:
-        return self.ip
