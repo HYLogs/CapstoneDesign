@@ -88,25 +88,19 @@ class send_type():
 		self.sec_data = b
 		self.time = time
 
-class Window(QtWidgets.QWidget):
-	def __init__(self, size=1.0):
+class Window(QtWidgets.QMainWindow):
+	def __init__(self, size=1.0, on_top=False):
 		super().__init__()
+		self.opacity=1								#투명도
+		self.name = "원격제어"						 #창 이름
 		self.size = size							#크기
+		self.on_top = on_top						#항상 위에 있을지
 		self.run_watch = 0							#실행타이머
 		self.rel_cursur_xy = [0,0]					#커서 좌표
 		self.rel_cusur_ratio = [0,0]				#커서 상대위치%
 		self.is_left_clicked = False
 		self.mouse_movetime = 0
 		self.setupUi()
-
-	def setupUi(self):
-		global screen_width, screen_height
-		self.centralWidget = QtWidgets.QWidget(self)
-		self.label = QtWidgets.QLabel(self.centralWidget)
-		self.width = int(screen_width)
-		self.height = int(screen_height)
-		self.setGeometry(0, 0, self.width, self.height)
-		self.imagemanager_pil()
 
 	def imagemanager_pil(self):			#이미지 변경
 		self.frame = np.asarray(img_data)
@@ -118,6 +112,29 @@ class Window(QtWidgets.QWidget):
 		width, height = pyautogui.size()
 		self.pixmap = self.pixmap.scaled(QSize(width, height), QtCore.Qt.KeepAspectRatioByExpanding)	#사이즈 변경
 		self.label.setPixmap(self.pixmap)	#적용
+
+	def setupUi(self):
+		global screen_width, screen_height
+		self.centralWidget = QtWidgets.QWidget(self)
+		self.setCentralWidget(self.centralWidget)
+		self.setflag(opacity=1)
+		self.setWindowTitle(self.name)						#윈도우 제목 지정
+		self.label = QtWidgets.QLabel(self.centralWidget)
+
+		self.width = int(screen_width)
+		self.height = int(screen_height)
+		self.setGeometry(0, 0, self.width, self.height)
+		self.imagemanager_pil()
+		self.show()
+
+	def setflag(self, Tool=False, FWH=False, opacity=1):				#플래그 및 투명도 지정함수
+		if (Tool): self.setWindowFlags(self.windowFlags() | QtCore.Qt.Tool)							#작업표시줄에 아이콘이 표시되지 않음
+		else: self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.Tool)
+		if (FWH): self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)			#윈도우 틀과 타이틀바 제거
+		else: self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.FramelessWindowHint)
+		if (self.on_top): self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)		#윈도우가 항상 맨 위에 있음
+		else: self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowStaysOnTopHint)
+		self.setWindowOpacity(opacity)
 
 	def mousePressEvent(self, event):
 		global send_queue, screen_width, screen_height
@@ -247,7 +264,9 @@ class RemoteCore(send_type, Window):
 		th_send.start()
 		th_receive_screen = threading.Thread(target=receiveScreen, args = (client_socket, HOST))		#받기함수 쓰레드
 		th_receive_screen.start()
-		app = QApplication(sys.argv)
-		window = Window()
-		window.show()
-		app.exec()
+
+
+		app = QtWidgets.QApplication(sys.argv)
+		window = Window(size=1, on_top=False)
+		window.run()
+		sys.exit(app.exec_())

@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from service import *
+import os
+IP = '0.0.0.0'
 
 class ComputerInfoDialog(QDialog):
     def __init__(self):
@@ -82,16 +84,20 @@ class TableItem(QWidget, Observer):
             self.setupUi()
         
     def remote_controll(self):
-        t = Thread(self.remote_controll_thread())
-        t.daemon = True
-        t.start()
-        
-    import os
-
-    def remote_controll_thread(self):
+        global IP
         if self.student is not None:
+            IP = self.student.ip
+            print(IP)
+            f = open('config.txt', 'w')
+            f.write(IP)
+            f.close()
             # self.service.remote_controll(self.student.ip)
-            RemoteCore(self.student.ip)
+            # RemoteCore(self.student.ip)
+            os.system('python testdrive.py')
+    
+    def get_remote_ip(self):
+        if self.student is not None:
+            print(self.student.ip)
 
 
     def mousePressEvent(self, event: QMouseEvent) -> None:

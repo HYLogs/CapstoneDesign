@@ -284,9 +284,6 @@ class RemoteControllPage(QWidget):
         super().__init__()
         uic.loadUi("ui/remote_controll.ui", self)
         self.main = parent
-        self.screen = self.ScreenLabel
-        remotecontrol = remote_control()
-        remote
         self.endRemoteControllBtn.clicked.connect(self.end_btn_handler)
 
 

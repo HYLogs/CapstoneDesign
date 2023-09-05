@@ -1,3 +1,8 @@
 from remote import *
+from customWidget import *
 
-RemoteCore('127.0.0.1')
+f = open('config.txt', 'r')
+IP = f.readline()
+print(IP)
+f.close()
+RemoteCore(IP)
