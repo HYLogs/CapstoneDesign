@@ -104,6 +104,11 @@ class Remote(RemoteCore):
 		self.stopsig = 0
 	
 	def startRemote(self, remoteScreen):
+		t = threading.Thread(target=self.threadedStart, args=(remoteScreen,))
+		t.daemon = True
+		t.start()
+
+	def threadedStart(self, remoteScreen):
 		remoteScreen.setScaledContents(True)
 		while self.stopsig == 0:
 			RemoteCore.__init__(self)

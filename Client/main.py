@@ -8,11 +8,18 @@ import threading
 from modules.Service.StudentService import StudentService
 from modules.CustomControls.Controls import MySizeGrip
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+def resource_path():
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return base_path
+
+BASE_DIR = resource_path()
+
+path = os.path.join(BASE_DIR, "Main.ui")
 
 # UI파일 연결
 # 단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
-form_class = uic.loadUiType(BASE_DIR + r"\Main.ui")[0]
+form_class = uic.loadUiType(path)[0]
 
 
 # 화면을 띄우는데 사용되는 Class 선언
@@ -52,7 +59,7 @@ class WindowClass(QMainWindow, form_class) :
     def setData(self):
         self.connect_label.setText(str(self.SService.student))
 
-        t = threading.Thread(target=self.SService.findTeacher, args=(self.first.stateImg, ))
+        t = threading.Thread(target=self.SService.findTeacher, args=(BASE_DIR, self.first.stateImg, ))
         t.daemon = True
         t.start()
 
@@ -132,19 +139,19 @@ class WindowClass(QMainWindow, form_class) :
 class First(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi(BASE_DIR + r"\UI\home_Qwidget.ui", self)
+        uic.loadUi(os.path.join(BASE_DIR, "UI/home_Qwidget.ui"), self)
 
 
 class Second(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi(BASE_DIR + r"\UI\remote_control.ui", self)
+        uic.loadUi(os.path.join(BASE_DIR, "UI/remote_control.ui"), self)
 
 
 class Third(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi(BASE_DIR + r"\UI\screen_share.ui", self)
+        uic.loadUi(os.path.join(BASE_DIR, "UI/screen_share.ui"), self)
 
 
 if __name__ == "__main__":
