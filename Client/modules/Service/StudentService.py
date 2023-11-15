@@ -8,7 +8,7 @@ from modules.function.Broadcast import BroadcastClient
 
 from PyQt5.QtGui import QPixmap
 import time
-
+import os
 # Main
 class StudentService:
     student: Student
@@ -63,17 +63,17 @@ class StudentService:
         name = socket.gethostname()
         return ip, name
 
-    def findTeacher(self, status):
+    def findTeacher(self, BASE_DIR, status):
         # 브로드캐스팅 수신
         bClient = BroadcastClient(1999)
         bClient.start()
         while True:
             if BroadcastClient.serverIP == "":
-                pixmap = QPixmap('resource/FailState.png')
+                pixmap = QPixmap(os.path.join(BASE_DIR, "resource/FailState.png"))
                 pixmap = pixmap.scaled(48, 48)
                 status.setPixmap(pixmap)
             else:
-                pixmap = QPixmap('resource/SuccessState.png')
+                pixmap = QPixmap(os.path.join(BASE_DIR, "resource/SuccessState.png"))
                 status.setPixmap(pixmap)
             teacher = Teacher(BroadcastClient.serverIP)
             self.student.set_teacher(teacher)

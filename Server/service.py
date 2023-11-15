@@ -1,8 +1,9 @@
 from domain import *
-from Broadcast import *
+from broadcast import *
 from time import sleep
 from utils.ObserverPattern import Observer
 
+from remote import *
 from ScreenShare import ScreenShareServer
 from threading import Thread
 
@@ -29,10 +30,10 @@ class TeacherService(Observer):
             self.students.append(Student())
         
     def apply_config(self):
-        # for items, student in zip(self.config.students.items(), self.students):
-        #     name, memo = items
-        #     student.name = name
-        #     student.memo = memo
+        for items, student in zip(self.config.students.items(), self.students):
+            name, memo = items
+            student.name = name
+            student.memo = memo
         
         for name, memo in self.config.students.items():
             idx = int(name[-2:])
@@ -106,6 +107,7 @@ class TeacherService(Observer):
 
     def remote_controll(self, student):
         print("remote_controll start")
+        RemoteCore.__init__(self, student)
         pass
 
     def stop_remote_controll(self):

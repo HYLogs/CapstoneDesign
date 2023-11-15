@@ -5,9 +5,10 @@ from PyQt5.QtWidgets import *
 
 from domain import *
 from page import *
-from Broadcast import *
+from broadcast import *
 from utils.file import *
 from configuration import Configuration
+from remote import *
 
 form_class = uic.loadUiType("ui/main.ui")[0]
 
