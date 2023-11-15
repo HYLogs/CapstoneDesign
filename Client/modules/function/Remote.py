@@ -93,7 +93,6 @@ class RemoteCore:
 
 		if (control_type == "press"): pyautogui.keyDown(btn1)
 		elif (control_type == "release"): pyautogui.keyUp(btn1)
-
 # Remote Class
 class Remote(RemoteCore):
 	ESC_KEY = 27
@@ -117,4 +116,3 @@ class Remote(RemoteCore):
 	
 	def closeEvent(self):
 		self.stopsig = 1
-		

@@ -9,7 +9,6 @@ from modules.function.Broadcast import BroadcastClient
 from PyQt5.QtGui import QPixmap
 import time
 import os
-
 # Main
 class StudentService:
     student: Student

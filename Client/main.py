@@ -21,7 +21,6 @@ path = os.path.join(BASE_DIR, "Main.ui")
 # 단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 form_class = uic.loadUiType(path)[0]
 
-
 # 화면을 띄우는데 사용되는 Class 선언
 class WindowClass(QMainWindow, form_class) :
     def __init__(self) :

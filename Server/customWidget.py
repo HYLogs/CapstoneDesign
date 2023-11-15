@@ -99,7 +99,6 @@ class TableItem(QWidget, Observer):
         if self.student is not None:
             print(self.student.ip)
 
-
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.RightButton:
             pos = event.globalPos()

@@ -285,9 +285,7 @@ class RemoteControllPage(QWidget):
         uic.loadUi("ui/remote_controll.ui", self)
         self.main = parent
         self.endRemoteControllBtn.clicked.connect(self.end_btn_handler)
-
-
-                
+               
     def end_btn_handler(self):
         # TODO 통신 종료
         self.main.teacher_service.stop_remote_controll()
