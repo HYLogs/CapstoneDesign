@@ -11,7 +11,6 @@ from service import *
 from page import *
 from customWidget import *
 
-
 from utils.ObserverPattern import Observer
 
 class TableSettingPage(QWidget):
@@ -211,7 +210,7 @@ class SupervisionPage(QWidget, Observer):
             for j in range(col):
                 if self.check_pos(i, j):
                     student = self.teacher_service.students[index]
-                    item = TableItem(self.studentTable, student, config=self.config)
+                    item = TableItem(self.studentTable, student, config=self.config, service=self.teacher_service)
                     student.addObserver(item)
                     index += 1
                     self.studentTable.setCellWidget(i, j, item)
@@ -279,16 +278,14 @@ class SupervisionPage(QWidget, Observer):
     #                 item.set_student(students[index])
     #                 index += 1
             
-            
-        
+
 class RemoteControllPage(QWidget):
     def __init__(self, parent) -> None:
         super().__init__()
         uic.loadUi("ui/remote_controll.ui", self)
         self.main = parent
-        
         self.endRemoteControllBtn.clicked.connect(self.end_btn_handler)
-                
+               
     def end_btn_handler(self):
         # TODO 통신 종료
         self.main.teacher_service.stop_remote_controll()

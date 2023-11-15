@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from service import *
+import os
+IP = '0.0.0.0'
 
 class ComputerInfoDialog(QDialog):
     def __init__(self):
@@ -20,7 +22,7 @@ class ComputerInfoDialog(QDialog):
         self.detailTextEdit.setText(detail)
 
 class TableItem(QWidget, Observer):
-    def __init__(self, parent:QTableWidget, student=None, config=None) -> None:
+    def __init__(self, parent:QTableWidget, student=None, config=None, service=None) -> None:
         super().__init__()
         uic.loadUi("./ui/table_item.ui", self)
 
@@ -33,6 +35,7 @@ class TableItem(QWidget, Observer):
         self._detail = student.memo
         self.student = student
         self.config = config
+        self.service = service
         self.setupUi()
 
     def setupUi(self) -> None:
@@ -81,12 +84,21 @@ class TableItem(QWidget, Observer):
             self.setupUi()
         
     def remote_controll(self):
-        pass
-        # if self.student is not None:
-        #     teacher = Teacher()
-        #     # service = TeacherService(teacher)
-        #     service.remote_controll(self.student)
-        
+        global IP
+        if self.student is not None:
+            IP = self.student.ip
+            print(IP)
+            f = open('config.txt', 'w')
+            f.write(IP)
+            f.close()
+            # self.service.remote_controll(self.student.ip)
+            # RemoteCore(self.student.ip)
+            os.system('python testdrive.py')
+    
+    def get_remote_ip(self):
+        if self.student is not None:
+            print(self.student.ip)
+
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.RightButton:
             pos = event.globalPos()
