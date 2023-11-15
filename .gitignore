@@ -1,0 +1,12 @@
+*.pyc
+__pycache__/
+setting.json
+.idea
+.vscode
+
+Client/__pycache__
+Client/.idea
+Client/build
+Client/dist
+
+Server/__pycache__
